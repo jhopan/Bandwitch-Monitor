@@ -44,7 +44,7 @@ dash.description=string.format("%d configured device(s), %d blocked. Warning: ye
 local dev=m:section(TypedSection,"device",translate("Devices"),translate("Select active DHCP lease. Each device has independent quota.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
 dev:option(Value,"name",translate("Name")); local mac=dev:option(ListValue,"mac",translate("DHCP device")); picker(mac)
 local quota=dev:option(Value,"quota_gb",translate("Quota (GB)"))
-function quota.validate(self,v) v=(v or ""):gsub(",", "."); if v:match("^(0|[1-9][0-9]*)(%.[0-9]+)?$") and tonumber(v)>0 then return v end; return nil, translate("Use a positive GB value, e.g. 0,1 or 0.5") end
+function quota.validate(self,v) v=(v or ""):gsub(",", "."); if v:match("^%d+%.?%d*$") and tonumber(v)>0 then return v end; return nil, translate("Use a positive GB value, e.g. 0,1 or 0.5") end
 local rolling=dev:option(ListValue,"rolling_days",translate("Per-device reset")); rolling:value("0",translate("Use monthly reset")); rolling:value("7",translate("Every 7 days")); rolling:value("30",translate("Every 30 days")); rolling.default="0"
 dev:option(Flag,"enabled",translate("Enabled"))
 local last=dev:option(DummyValue,"last",translate("Last seen")); function last.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local b="/etc/bandwidth-control/"..mac:lower(); local f=io.open(b..".last_seen"); local t=f and f:read("*l") or "Never"; if f then f:close() end; local h=io.open(b..".host"); local n=h and h:read("*l") or ""; if h then h:close() end; local i=io.open(b..".ip"); local ip=i and i:read("*l") or ""; if i then i:close() end; return t.." "..n.." "..ip end
