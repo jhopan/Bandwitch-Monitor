@@ -7,6 +7,7 @@ trap 'rm -rf "$STAGE"' EXIT
 rm -rf "$OUT" "$STAGE"
 mkdir -p "$OUT" "$STAGE/control" "$STAGE/data"
 cp "$ROOT/CONTROL/control" "$STAGE/control/control"
+cp "$ROOT/CONTROL/conffiles" "$STAGE/control/conffiles"
 cp "$ROOT/CONTROL/postinst" "$STAGE/control/postinst"
 cp -a "$ROOT/files/." "$STAGE/data/"
 mkdir -p "$STAGE/data/usr/lib/lua/luci"
