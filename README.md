@@ -65,6 +65,41 @@ Current local package:
 dist/bandwidth-control_1.0.0-1_all.ipk
 ```
 
+## Download and Release
+
+Every push to `main` runs shell tests and builds an IPK artifact in GitHub Actions. A tag such as `v1.0.0` creates a GitHub Release with:
+
+```text
+bandwidth-control_*.ipk
+SHA256SUMS
+```
+
+Download release IPK from:
+
+```text
+https://github.com/jhopan/Bandwitch-Monitor/releases
+```
+
+On an internet-connected OpenWrt router, install latest release:
+
+```sh
+wget -O /tmp/install-bandwidth-control.sh https://raw.githubusercontent.com/jhopan/Bandwitch-Monitor/main/scripts/install-release.sh
+sh /tmp/install-bandwidth-control.sh
+```
+
+`nlbwmon` is not bundled because it must match router OpenWrt release and architecture. Install it first:
+
+```sh
+opkg update
+opkg install nlbwmon
+```
+
+Verify downloaded asset:
+
+```sh
+sha256sum -c SHA256SUMS
+```
+
 ## Usage
 
 Open LuCI:
