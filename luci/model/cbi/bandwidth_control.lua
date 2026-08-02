@@ -2,7 +2,7 @@ local sys = require "luci.sys"
 local util = require "luci.util"
 
 local function split(s)
- local t={} for v in (s or ""):gmatch("[^|]*") do t[#t+1]=v end return t
+ local t={} for v in (s or ""):gmatch("[^|]+") do t[#t+1]=v end return t
 end
 local function usage(mac)
  local a=split(sys.exec("/usr/libexec/bandwidth-control/check usage "..util.shellquote(mac).." 2>/dev/null"):gsub("%s+$", ""))
