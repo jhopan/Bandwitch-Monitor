@@ -1,0 +1,9 @@
+#!/bin/sh
+# Package works only with nlbwmon installed and active.
+uci -q set bandwidth-control.main=main
+uci -q set bandwidth-control.main.enabled='1'
+uci -q set bandwidth-control.main.interval='60'
+uci commit bandwidth-control
+/etc/init.d/bandwidth-control enable
+/etc/init.d/bandwidth-control start
+exit 0

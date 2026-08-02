@@ -1,0 +1,7 @@
+Package: bandwidth-control
+Version: 1.0.0-1
+Architecture: all
+Maintainer: Jhopan
+Depends: nlbwmon, nftables-json, luci-base, luci-compat
+Description: Per-MAC and group quota enforcement with LuCI management
+Installed-Size: 16

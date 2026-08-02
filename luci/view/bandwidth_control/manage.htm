@@ -1,0 +1,11 @@
+<div class="cbi-section">
+ <h3><%:Audit log%></h3>
+ <pre style="max-height:14em;overflow:auto"><%=pcdata(luci.sys.exec('/usr/libexec/bandwidth-control/check audit 50 2>/dev/null'))%></pre>
+ <h3><%:Backup and restore%></h3>
+ <p><a class="cbi-button cbi-button-action" href="<%=url('admin/services/bandwidth-control/backup')%>"><%:Download backup%></a></p>
+ <form method="post" action="<%=url('admin/services/bandwidth-control/restore')%>" enctype="multipart/form-data">
+  <input type="file" name="archive" accept=".tar.gz,application/gzip" required="required" />
+  <input class="cbi-button cbi-button-apply" type="submit" value="<%:Restore backup%>" />
+ </form>
+ <p><em><%:Restore replaces Bandwidth Control settings and usage state only.%></em></p>
+</div>

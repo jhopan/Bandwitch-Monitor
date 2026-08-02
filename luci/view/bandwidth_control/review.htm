@@ -1,0 +1,13 @@
+<div class="cbi-section">
+	<h3><%:Manual review%></h3>
+	<table class="table">
+		<tr><th><%:Name%></th><th>MAC</th><th><%:Used%></th><th><%:Status%></th><th><%:Action%></th></tr>
+		<% for _, s in ipairs(self:cfgsections()) do
+			local mac = self.map.uci:get("bandwidth-control", s, "mac")
+			local name = self.map.uci:get("bandwidth-control", s, "name") or s
+			local used, blocked = require("luci.controller.bandwidth_control").status(nil, mac)
+		%>
+		<tr><td><%=pcdata(name)%></td><td><%=pcdata(mac)%></td><td><%=pcdata(require("luci.controller.bandwidth_control").bytes(used))%></td><td><%=blocked and translate("Blocked") or translate("Allowed")%></td><td><% if blocked then %><form method="post" action="<%=url('admin/services/bandwidth-control/unblock')%>"><input type="hidden" name="mac" value="<%=pcdata(mac)%>" /><input class="cbi-button cbi-button-apply" type="submit" value="<%:Unblock%>" /></form><% end %></td></tr>
+		<% end %>
+	</table>
+</div>

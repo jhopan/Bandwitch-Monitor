@@ -1,0 +1,11 @@
+.build-stage/
+.verify/
+deps/
+*.tar.gz
+*.log
+
+# OpenWrt runtime state
+files/etc/bandwidth-control/
+
+# Keep release package in dist/
+!dist/bandwidth-control_*.ipk

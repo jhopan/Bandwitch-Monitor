@@ -1,0 +1,26 @@
+#!/bin/sh
+set -u
+STATE=${BC_STATE:-/etc/bandwidth-control}; mkdir -p "$STATE"
+mac_ok(){ echo "$1"|grep -Eiq '^([0-9a-f]{2}:){5}[0-9a-f]{2}$'; }
+mac_lc(){ echo "$1"|tr A-F a-f; }
+base(){ echo "$STATE/$(mac_lc "$1")"; }
+audit(){ printf '%s|%s|%s|%s|%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$(mac_lc "$1")" "$2" "$3" "${4:-}" >> "$STATE/audit.log"; tail -n 200 "$STATE/audit.log" > "$STATE/.audit" && mv "$STATE/.audit" "$STATE/audit.log"; }
+nft_init(){ nft list table inet bandwidth_control >/dev/null 2>&1 || nft -f - <<'EOF'
+table inet bandwidth_control { set blocked_macs { type ether_addr; flags interval; } chain forward { type filter hook forward priority filter; policy accept; ether saddr @blocked_macs drop; } }
+EOF
+}
+raw(){ nlbw -c csv -g mac -o mac -q 2>/dev/null|awk -F '\t' -v m="$(mac_lc "$1")" 'tolower($1)==m {rx+=$3;tx+=$5} END{print rx+0 "|" tx+0 "|" rx+tx+0}'; }
+usage(){ mac=$(mac_lc "$1"); r=$(raw "$mac"); b=$(cat "$(base "$mac").baseline" 2>/dev/null||echo '0|0|0'); awk -F'|' -v r="$r" -v b="$b" 'BEGIN{split(r,x,"|");split(b,y,"|"); for(i=1;i<=3;i++){v=x[i]-y[i];if(v<0)v=x[i]; printf "%d%s",v,i==3?"\n":"|"}}'; }
+used(){ usage "$1"|awk -F'|' '{print $3}'; }
+reset(){ mac=$(mac_lc "$1"); raw "$mac" > "$(base "$mac").baseline"; date +%s > "$(base "$mac").reset_at"; audit "$mac" reset manual; }
+history(){ mac=$(mac_lc "$1"); leases | awk -F'|' -v m="$mac" '$1==m{print $2 "|" $3}' | while IFS='|' read ip host; do printf '%s\n' "$ip" > "$(base "$mac").ip"; printf '%s\n' "$host" > "$(base "$mac").host"; date '+%Y-%m-%d %H:%M:%S' > "$(base "$mac").last_seen"; done; }
+rolling(){ mac=$(mac_lc "$1"); days=${2:-0}; case "$days" in ''|*[!0-9]*) return;; esac; [ "$days" -gt 0 ] || return; at=$(cat "$(base "$mac").reset_at" 2>/dev/null || echo 0); [ $(( $(date +%s) - at )) -ge $((days*86400)) ] && reset "$mac"; }
+block(){ mac=$(mac_lc "$1"); why=${2:-manual}; mac_ok "$mac"||exit 2; nft_init; nft add element inet bandwidth_control blocked_macs "{ $mac }" 2>/dev/null||true; :>"$(base "$mac").blocked"; printf '%s\n' "$why">"$(base "$mac").reason"; date '+%Y-%m-%d %H:%M:%S'>"$(base "$mac").at"; audit "$mac" block "$why"; }
+unblock(){ mac=$(mac_lc "$1"); mac_ok "$mac"||exit 2; nft_init; nft delete element inet bandwidth_control blocked_macs "{ $mac }" 2>/dev/null||true; rm -f "$(base "$mac").blocked" "$(base "$mac").reason" "$(base "$mac").at"; audit "$mac" unblock manual; }
+status(){ b=$(base "$1"); [ -f "$b.blocked" ]&&printf 'blocked|%s|%s\n' "$(cat "$b.reason")" "$(cat "$b.at")"||printf 'allowed||\n'; }
+leases(){ awk 'NF>=4{h=$4;if(h=="*")h="unknown";print tolower($2)"|"$3"|"h}' "${BC_LEASES:-/tmp/dhcp.leases}" 2>/dev/null; }
+quota(){ q=$(printf %s "$1"|tr , .); echo "$q"|grep -Eq '^(0|[1-9][0-9]*)(\.[0-9]+)?$'||return 2; awk -v q="$q" 'BEGIN{printf "%.0f\n",q*1073741824}'; }
+check_dev(){ s=$1; mac=$(uci -q get bandwidth-control.$s.mac)||return; [ "$(uci -q get bandwidth-control.$s.enabled||echo 1)" = 1 ]||return; history "$mac"; rolling "$mac" "$(uci -q get bandwidth-control.$s.rolling_days||echo 0)"; lim=$(quota "$(uci -q get bandwidth-control.$s.quota_gb||echo 0)")||return; [ "$(used "$mac")" -ge "$lim" ]&&block "$mac" quota; }
+check_group(){ s=$1; [ "$(uci -q get bandwidth-control.$s.enabled||echo 1)" = 1 ]||return; lim=$(quota "$(uci -q get bandwidth-control.$s.quota_gb||echo 0)")||return; macs=$(uci -q get bandwidth-control.$s.mac 2>/dev/null||true); [ -n "$macs" ]||return; total=0; for mac in $macs;do total=$((total+$(used "$mac")));done; [ "$total" -ge "$lim" ]&&for mac in $macs;do block "$mac" quota-group;done; }
+check(){ [ "$(uci -q get bandwidth-control.main.enabled||echo 0)" = 1 ]||return; nft_init; uci show bandwidth-control|sed -n 's/^bandwidth-control\.\([^.=]*\)=device$/\1/p'|while read s;do check_dev "$s";done; uci show bandwidth-control|sed -n 's/^bandwidth-control\.\([^.=]*\)=group$/\1/p'|while read s;do check_group "$s";done; }
+case "${1:-check}" in check)check;;block)block "$2" "${3:-manual}";;unblock)unblock "$2";;reset)reset "$2";;used)used "$2";;usage)usage "$2";;status)status "$2";;leases)leases;;history)history "$2";;quota-bytes)quota "$2";;audit)tail -n "${2:-50}" "$STATE/audit.log" 2>/dev/null||true;;*)exit 2;;esac
