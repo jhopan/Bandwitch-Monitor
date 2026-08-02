@@ -5,12 +5,17 @@ mac_ok(){ echo "$1"|grep -Eiq '^([0-9a-f]{2}:){5}[0-9a-f]{2}$'; }
 mac_lc(){ echo "$1"|tr A-F a-f; }
 base(){ echo "$STATE/$(mac_lc "$1")"; }
 audit(){ printf '%s|%s|%s|%s|%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$(mac_lc "$1")" "$2" "$3" "${4:-}" >> "$STATE/audit.log"; tail -n 200 "$STATE/audit.log" > "$STATE/.audit" && mv "$STATE/.audit" "$STATE/audit.log"; }
-nft_init(){ nft list table inet bandwidth_control >/dev/null 2>&1 || nft -f - <<'EOF'
+nft_init(){
+ if ! nft list table inet bandwidth_control 2>/dev/null | grep -q 'priority filter - 1'; then
+  nft delete table inet bandwidth_control 2>/dev/null || true
+  nft -f - <<'EOF'
 table inet bandwidth_control {
  set blocked_macs { type ether_addr; flags interval; }
- chain forward { type filter hook forward priority filter; policy accept; ether saddr @blocked_macs drop; }
+ chain forward { type filter hook forward priority filter - 1; policy accept; ether saddr @blocked_macs drop; }
 }
 EOF
+  for f in "$STATE"/*.blocked; do [ -e "$f" ] || continue; mac=${f##*/}; mac=${mac%.blocked}; nft add element inet bandwidth_control blocked_macs "{ $mac }" 2>/dev/null || true; done
+ fi
 }
 raw(){ nlbw -c csv -g mac -o mac -q 2>/dev/null|awk -F '\t' -v m="$(mac_lc "$1")" 'tolower($1)==m {rx+=$3;tx+=$5} END{print rx+0 "|" tx+0 "|" rx+tx+0}'; }
 usage(){ mac=$(mac_lc "$1"); r=$(raw "$mac"); b=$(cat "$(base "$mac").baseline" 2>/dev/null||echo '0|0|0'); awk -F'|' -v r="$r" -v b="$b" 'BEGIN{split(r,x,"|");split(b,y,"|"); for(i=1;i<=3;i++){v=x[i]-y[i];if(v<0)v=x[i]; printf "%d%s",v,i==3?"\n":"|"}}'; }
