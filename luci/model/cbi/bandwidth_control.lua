@@ -27,6 +27,7 @@ local function picker(o)
 end
 
 local m=Map("bandwidth-control",translate("Bandwidth Control"),translate("Quota counts download + upload during current nlbwmon period. MAC is enforcement identity; static IP is optional."))
+m:append(Template("bandwidth_control/styles"))
 local main=m:section(TypedSection,"main",translate("Service and quota reset")); main.anonymous=true; main.addremove=false
 main:option(Flag,"enabled",translate("Enable"))
 local interval=main:option(Value,"interval",translate("Check interval (seconds)")); interval.datatype="uinteger"; interval.default=60

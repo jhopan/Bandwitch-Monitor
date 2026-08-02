@@ -1,0 +1,16 @@
+<style>
+/* LuCI CBI table: keep all device controls usable instead of wrapping into overlap. */
+.cbi-section-table { display:block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cbi-section-table table { min-width: 1550px; }
+.cbi-section-table th, .cbi-section-table td { white-space: nowrap; vertical-align: middle; padding: .45rem .55rem; }
+.cbi-section-table input[type="text"], .cbi-section-table select { min-width: 9rem; max-width: 14rem; }
+.cbi-section-table .cbi-button { margin: .12rem; }
+.cbi-section-table td:last-child { position: sticky; right: 0; background: var(--background-color-high, #fff); box-shadow: -3px 0 6px rgba(0,0,0,.08); }
+.bc-hint { color:#6b7280; font-size:.9em; }
+@media (max-width: 900px) {
+ .cbi-section-table { border:1px solid #d1d5db; border-radius:.35rem; }
+ .cbi-section-table th, .cbi-section-table td { padding:.35rem; }
+ .cbi-section-table input[type="text"], .cbi-section-table select { min-width: 8rem; max-width: 10rem; }
+}
+</style>
+<div class="bc-hint">Device table is scrollable horizontally. On phone, swipe left/right to see all controls.</div>
