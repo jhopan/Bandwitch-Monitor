@@ -24,7 +24,7 @@
     form.addEventListener('submit', function () { dirty = true; });
   }
   function refresh() {
-    if (!dirty && !document.querySelector(':focus')) window.location.reload();
+    if (!dirty && !document.querySelector(':focus')) window.location.href = window.location.pathname;
     else setTimeout(refresh, 30000);
   }
   setTimeout(refresh, 30000);
