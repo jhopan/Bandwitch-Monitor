@@ -13,4 +13,20 @@
  .cbi-section-table input[type="text"], .cbi-section-table select { min-width: 8rem; max-width: 10rem; }
 }
 </style>
-<div class="bc-hint">Device table is scrollable horizontally. On phone, swipe left/right to see all controls.</div>
+<div class="bc-hint">Device table is scrollable horizontally. On phone, swipe left/right to see all controls. Usage refreshes every 30 seconds when no form field is being edited.</div>
+<script>
+(function () {
+  var dirty = false;
+  var form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('input', function () { dirty = true; });
+    form.addEventListener('change', function () { dirty = true; });
+    form.addEventListener('submit', function () { dirty = true; });
+  }
+  function refresh() {
+    if (!dirty && !document.querySelector(':focus')) window.location.reload();
+    else setTimeout(refresh, 30000);
+  }
+  setTimeout(refresh, 30000);
+}());
+</script>

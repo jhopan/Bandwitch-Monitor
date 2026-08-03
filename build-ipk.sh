@@ -18,5 +18,6 @@ chmod 0755 "$STAGE/control/postinst" "$STAGE/data/etc/init.d/bandwidth-control" 
 printf '2.0\n' > "$STAGE/debian-binary"
 tar -C "$STAGE/control" -czf "$STAGE/control.tar.gz" .
 tar -C "$STAGE/data" -czf "$STAGE/data.tar.gz" .
-tar -C "$STAGE" -czf "$OUT/bandwidth-control_1.0.0-1_all.ipk" debian-binary control.tar.gz data.tar.gz
-printf 'Built %s\n' "$OUT/bandwidth-control_1.0.0-1_all.ipk"
+VERSION=$(awk -F': ' '/^Version:/{print $2}' "$ROOT/CONTROL/control")
+tar -C "$STAGE" -czf "$OUT/bandwidth-control_${VERSION}_all.ipk" debian-binary control.tar.gz data.tar.gz
+printf 'Built %s\n' "$OUT/bandwidth-control_${VERSION}_all.ipk"
