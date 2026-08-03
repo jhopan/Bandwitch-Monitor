@@ -23,6 +23,7 @@
 - Monthly global reset or per-device 7/30 day rolling reset.
 - Usage details, last seen hostname/IP, block reason, timestamp.
 - Audit log, backup, restore.
+- LuCI usage refresh every 30 seconds. Refresh returns to the main page, so action endpoints such as Reset are never repeated.
 
 ## Requirements
 
@@ -62,7 +63,7 @@ opkg install /tmp/bandwidth-control_*.ipk
 Current local package:
 
 ```text
-dist/bandwidth-control_1.0.1-1_all.ipk
+dist/bandwidth-control_1.0.2-1_all.ipk
 ```
 
 ## Download and Release
