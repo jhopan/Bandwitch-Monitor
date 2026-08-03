@@ -16,7 +16,7 @@
 - Per-MAC quota. Supports decimal GB: `0,1`, `0.5`, `1,5`.
 - Shared quota groups.
 - Download + upload accounting via `nlbwmon`.
-- Auto block through nftables after quota is reached.
+- Auto block through nftables after quota is reached. Verified on a live OpenWrt AP + LAN bridge deployment.
 - Manual block, unblock, and reset quota baseline.
 - DHCP lease picker. Quota stays attached to MAC if IP changes.
 - Optional static DHCP lease button.
@@ -62,7 +62,7 @@ opkg install /tmp/bandwidth-control_*.ipk
 Current local package:
 
 ```text
-dist/bandwidth-control_1.0.0-1_all.ipk
+dist/bandwidth-control_1.0.1-1_all.ipk
 ```
 
 ## Download and Release
@@ -124,6 +124,16 @@ Use `0,1` GB then download roughly 120–150 MB through router WAN. Verify:
 nlbw -c csv -g mac -o mac -q
 nft list table inet bandwidth_control
 /usr/libexec/bandwidth-control/check status AA:BB:CC:DD:EE:FF
+```
+
+Live verification completed:
+
+```text
+Quota: 0.1 GB
+Traffic source: client behind LAN-to-LAN AP bridge
+Accounting: nlbwmon RX + TX per MAC
+Enforcement: nftables source-MAC drop before fw4 LAN-to-WAN accept rules
+Result: internet access blocked after quota reached
 ```
 
 Expected status after quota is reached:
