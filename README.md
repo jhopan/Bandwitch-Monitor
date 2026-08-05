@@ -179,6 +179,16 @@ for test in tests/*.sh; do sh "$test"; done
 - No speed limiter yet. Future speed shaping should use `tc`/CAKE separately.
 - Captive portal redirect is not included. Blocked clients lose routed internet access.
 
+## AI and Development Handoff
+
+Read these before changing behavior:
+
+- `AGENTS.md` — rules, invariants, test and packaging workflow
+- `PRD.md` — product requirements and acceptance criteria
+- `TECHNICAL-DESIGN.md` — architecture, state model, nftables ordering
+- `ROADMAP.md` — shipped work and next priorities
+- `DEVELOPMENT.md` — local build, STB deploy, troubleshooting, release workflow
+
 ## License
 
 No license selected yet.
