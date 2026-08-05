@@ -17,7 +17,7 @@
 - Shared quota groups.
 - Download + upload accounting via `nlbwmon`.
 - Auto block through nftables after quota is reached. Verified on a live OpenWrt AP + LAN bridge deployment.
-- Manual block, unblock, and reset quota baseline.
+- Manual block, unblock, and persistent reset quota baseline. Usage survives service/router restarts.
 - DHCP lease picker. Quota stays attached to MAC if IP changes.
 - Optional static DHCP lease button.
 - Monthly global reset or per-device 7/30 day rolling reset.

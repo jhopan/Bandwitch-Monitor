@@ -55,6 +55,8 @@ config group
 | File | Meaning |
 |---|---|
 | `.baseline` | nlbwmon RX/TX/total at reset |
+| `.last_raw` | last raw nlbwmon RX/TX/total seen by quota engine |
+| `.used` | persistent RX/TX/total accumulated since reset; survives nlbwmon restart |
 | `.reset_at` | epoch reset timestamp |
 | `.blocked` | blocked marker |
 | `.reason` | `quota`, `quota-group`, `manual` |
@@ -67,12 +69,15 @@ config group
 `nlbw -c csv -g mac -o mac -q` provides raw RX/TX. The engine computes:
 
 ```text
-usage_rx = max(0, raw_rx - baseline_rx)
-usage_tx = max(0, raw_tx - baseline_tx)
-usage_total = usage_rx + usage_tx
+delta_rx = raw_rx - last_raw_rx
+delta_tx = raw_tx - last_raw_tx
+if delta becomes negative: use current raw counter after nlbwmon restart/period rollover
+used_rx += delta_rx
+used_tx += delta_tx
+used_total = used_rx + used_tx
 ```
 
-If nlbwmon period rolls over and raw counter becomes lower than baseline, raw becomes new effective usage to prevent negative values.
+`.used` and `.last_raw` persist on disk. Restarting `nlbwmon`, `bandwidth-control`, or router does not reset quota usage. Only Reset now creates a new zero baseline.
 
 ## Enforcement
 
