@@ -17,11 +17,16 @@ end
 local function command(cmd,mac)
  return split(sys.exec("/usr/libexec/bandwidth-control/check "..cmd.." "..string.format("'%s'",mac:gsub("'","'\\''")).." 2>/dev/null"):gsub("%s+$",""))
 end
+local function read_state(mac, suffix)
+ local f=io.open("/etc/bandwidth-control/"..mac:lower()..suffix)
+ if not f then return "" end
+ local value=f:read("*l") or ""; f:close(); return value
+end
 function status()
  local devices={}
  uci:foreach("bandwidth-control","device",function(s)
   local mac=s.mac or ""; local usage=command("usage",mac); local state=command("status",mac)
-  devices[#devices+1]={section=s[".name"],mac=mac,download=tonumber(usage[1]) or 0,upload=tonumber(usage[2]) or 0,used=tonumber(usage[3]) or 0,state=state[1] or "allowed",reason=state[2] or "",at=state[3] or ""}
+  devices[#devices+1]={section=s[".name"],mac=mac,download=tonumber(usage[1]) or 0,upload=tonumber(usage[2]) or 0,used=tonumber(usage[3]) or 0,state=state[1] or "allowed",reason=state[2] or "",at=state[3] or "",last_seen=read_state(mac,".last_seen")}
  end)
  http.prepare_content("application/json"); http.write_json({devices=devices})
 end

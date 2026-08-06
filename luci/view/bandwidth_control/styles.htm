@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function(data) {
         (data.devices || []).forEach(function(d) {
           document.querySelectorAll('.bc-live-value[data-bc-mac="' + d.mac + '"]').forEach(function(node) {
-            if (node.dataset.bcField === 'used') {
+            if (node.dataset.bcField === 'last') node.textContent = d.last_seen || 'Never';
+            else if (node.dataset.bcField === 'used') {
               var quotaInput = node.closest('tr').querySelector('input[name$=".quota_gb"]');
               var quota = quotaInput ? quotaInput.value.replace(',', '.') : '0';
               node.textContent = fmt(d.used) + ' / ' + quota + ' GB';
