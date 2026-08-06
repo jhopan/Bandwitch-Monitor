@@ -15,7 +15,7 @@
 
 - Per-MAC quota. Supports decimal GB: `0,1`, `0.5`, `1,5`.
 - Shared quota groups with total usage, remaining quota, RX/TX, member count, and quota status in LuCI.
-- Download + upload accounting via `nlbwmon`.
+- Download + upload accounting via `nlbwmon`, with persistent 64-bit-safe counters for multi-gigabyte and terabyte-scale quotas.
 - Auto block through nftables after quota is reached. Verified on a live OpenWrt AP + LAN bridge deployment.
 - Manual block, unblock, and persistent reset quota baseline. Usage survives service/router restarts.
 - DHCP lease picker. Device MAC locks after save; Edit MAC is required to change identity. Duplicate device MACs are rejected.

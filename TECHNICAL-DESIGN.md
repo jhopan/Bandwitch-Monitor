@@ -77,7 +77,7 @@ used_tx += delta_tx
 used_total = used_rx + used_tx
 ```
 
-`.used` and `.last_raw` persist on disk. Restarting `nlbwmon`, `bandwidth-control`, or router does not reset quota usage. Only Reset now creates a new zero baseline.
+`.used` and `.last_raw` persist on disk. All persisted arithmetic uses `awk` decimal numbers rather than shell integer arithmetic, so counters can exceed 2 GiB and support terabyte-scale quotas. Restarting `nlbwmon`, `bandwidth-control`, or router does not reset quota usage. Only Reset now creates a new zero baseline.
 
 ## Enforcement
 
