@@ -12,6 +12,15 @@ local function state(mac)
  local a=split(sys.exec("/usr/libexec/bandwidth-control/check status "..util.shellquote(mac).." 2>/dev/null"):gsub("%s+$", ""))
  return a[1] or "allowed", a[2] or "", a[3] or ""
 end
+local function group_usage(macs)
+ local args=""; for _,mac in ipairs(macs or {}) do args=args.." "..util.shellquote(mac) end
+ local a=split(sys.exec("/usr/libexec/bandwidth-control/check group-usage"..args.." 2>/dev/null"):gsub("%s+$", ""))
+ return tonumber(a[1]) or 0, tonumber(a[2]) or 0, tonumber(a[3]) or 0
+end
+local function quota_value(v)
+ local raw=(v or "0"):gsub(",",".")
+ return tonumber(raw) or 0
+end
 local function fmt(n)
  if n >= 1073741824 then return string.format("%.2f GB",n/1073741824) end
  if n >= 1048576 then return string.format("%.2f MB",n/1048576) end
@@ -58,7 +67,10 @@ local fixed=dev:option(Button,"static",translate("Static IP")); fixed.inputtitle
 
 local manage=m:section(SimpleSection,translate("Audit and backup")); manage.template="bandwidth_control/manage"
 local group=m:section(TypedSection,"group",translate("Groups"),translate("All selected devices share one quota.")); group.anonymous=true; group.addremove=true; group.template="cbi/tblsection"
-group:option(Value,"name",translate("Name")); local gq=group:option(Value,"quota_gb",translate("Quota (GB)")); gq.datatype="uinteger"; local members=group:option(DynamicList,"mac",translate("DHCP devices")); picker(members); group:option(Flag,"enabled",translate("Enabled"))
+group:option(Value,"name",translate("Name")); local gq=group:option(Value,"quota_gb",translate("Quota (GB)")); gq.validate=quota.validate; local members=group:option(DynamicList,"mac",translate("DHCP devices")); picker(members); group:option(Flag,"enabled",translate("Enabled"))
+local gused=group:option(DummyValue,"usage",translate("Usage / remaining")); function gused.cfgvalue(self,s) local macs=self.map.uci:get_list("bandwidth-control",s,"mac") or {}; local _,_,n=group_usage(macs); local q=quota_value(self.map.uci:get("bandwidth-control",s,"quota_gb")); local limit=q*1073741824; local remain=math.max(0,limit-n); local pct=q>0 and math.floor(n/limit*100) or 0; return string.format("%s / %s GB (%d%%), left %s",fmt(n),q,pct,fmt(remain)) end
+local gdetail=group:option(DummyValue,"detail",translate("Down / Up / members")); function gdetail.cfgvalue(self,s) local macs=self.map.uci:get_list("bandwidth-control",s,"mac") or {}; local rx,tx=group_usage(macs); return string.format("%s / %s / %d device(s)",fmt(rx),fmt(tx),#macs) end
+local gstate=group:option(DummyValue,"status",translate("Status")); function gstate.cfgvalue(self,s) local macs=self.map.uci:get_list("bandwidth-control",s,"mac") or {}; local q=quota_value(self.map.uci:get("bandwidth-control",s,"quota_gb")); local _,_,n=group_usage(macs); return q>0 and n>=q*1073741824 and translate("Quota reached") or translate("Allowed") end
 function m.on_after_commit(self)
  local day=self.uci:get("bandwidth-control","main","reset_day")
  if day and day:match("^[1-9]$|^[12][0-9]$") then
