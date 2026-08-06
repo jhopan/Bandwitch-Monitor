@@ -14,6 +14,7 @@ mkdir -p "$STAGE/data/usr/lib/lua/luci"
 cp -a "$ROOT/luci/controller" "$STAGE/data/usr/lib/lua/luci/"
 cp -a "$ROOT/luci/model" "$STAGE/data/usr/lib/lua/luci/"
 cp -a "$ROOT/luci/view" "$STAGE/data/usr/lib/lua/luci/"
+find "$STAGE/data/usr/lib/lua/luci/view" -name "*.htm" -exec sed -i 's/\r//' {} \;
 chmod 0755 "$STAGE/control/postinst" "$STAGE/data/etc/init.d/bandwidth-control" "$STAGE/data/usr/libexec/bandwidth-control/check"
 printf '2.0\n' > "$STAGE/debian-binary"
 tar -C "$STAGE/control" -czf "$STAGE/control.tar.gz" .
