@@ -6,19 +6,20 @@
 .cbi-section-table input[type="text"], .cbi-section-table select { min-width: 7rem; max-width: 12rem; }
 .cbi-section-table .cbi-button { margin: .12rem; }
 .cbi-section-table td:last-child { position: sticky; right: 0; background: var(--background-color-high, #fff); box-shadow: -3px 0 6px rgba(0,0,0,.08); }
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(1) { min-width:15rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(1),
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(2),
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(3),
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4),
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(9),
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(10),
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(11) { text-align:center; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6),
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7),
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(8) { text-align:center; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(1) { min-width:8rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(2) { width:5.5rem; }
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(3) { min-width:6rem; }
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4) { min-width:10rem; }
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(9) { width:5.5rem; }
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(11) { min-width:8rem; }
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(3) input,
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4) select,
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(11) input { margin-left:auto; margin-right:auto; text-align:center; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4) { min-width:15rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) { min-width:6rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) { min-width:10rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) input,
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) select { margin-left:auto; margin-right:auto; text-align:center; }
 /* Replacement selector is absent until one row enters Edit MAC mode. */
 #cbi-bandwidth-control-device .bc-mac-edit-select { display:none; min-width:15rem; }
 #cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell; }

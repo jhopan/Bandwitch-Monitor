@@ -58,6 +58,9 @@ end)
 dash.description=string.format("%d configured device(s), %d blocked. Warning: yellow 80%%, red 95%%, blocked 100%%. Backup: <a href='%s'>download config and usage state</a>.",total,blocked,require("luci.dispatcher").build_url("admin/services/bandwidth-control/backup"))
 
 local dev=m:section(TypedSection,"device",translate("Devices"),translate("Quota per device. Click Edit only when replacing the connected device.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
+local name=dev:option(Value,"name",translate("Name")); name.template="bandwidth_control/edit_name"
+local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
+local stat=dev:option(DummyValue,"status",translate("Status")); stat.template="bandwidth_control/live_value"; function stat.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local a,b,c=state(mac); return a=="blocked" and ("Blocked: "..b.." "..c) or "Allowed" end
 local savedlease=dev:option(DummyValue,"saved_lease",translate("Current device"))
 function savedlease.cfgvalue(self,s)
  local value=self.map.uci:get("bandwidth-control",s,"mac") or ""
@@ -83,9 +86,6 @@ dev:option(Flag,"enabled",translate("Enabled"))
 local last=dev:option(DummyValue,"last",translate("Last seen")); last.template="bandwidth_control/live_value"; function last.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local b="/etc/bandwidth-control/"..mac:lower(); local f=io.open(b..".last_seen"); local t=f and f:read("*l") or "Never"; if f then f:close() end; return t end
 local used=dev:option(DummyValue,"used",translate("Usage / quota")); used.template="bandwidth_control/live_value"; function used.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local _,_,n=usage(mac); local q=quota_value(self.map.uci:get("bandwidth-control",s,"quota_gb")); return string.format("%s / %s GB",fmt(n),q) end
 local details=dev:option(DummyValue,"details",translate("Download / upload")); details.template="bandwidth_control/live_value"; function details.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local rx,tx=usage(mac); return fmt(rx).." / "..fmt(tx) end
-local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
-local stat=dev:option(DummyValue,"status",translate("Status")); stat.template="bandwidth_control/live_value"; function stat.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local a,b,c=state(mac); return a=="blocked" and ("Blocked: "..b.." "..c) or "Allowed" end
-local name=dev:option(Value,"name",translate("Name")); name.template="bandwidth_control/edit_name"
 local block=dev:option(Button,"block",translate("Manual block")); block.inputtitle=translate("Block now"); block.inputstyle="remove"; function block.write(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac"); if mac then sys.call("/usr/libexec/bandwidth-control/check block "..util.shellquote(mac).." manual") end end
 local un=dev:option(Button,"unblock",translate("Manual review")); un.inputtitle=translate("Unblock"); un.inputstyle="apply"; function un.write(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac"); if mac then sys.call("/usr/libexec/bandwidth-control/check unblock "..util.shellquote(mac)) end end
 local clear=dev:option(Button,"reset",translate("Reset quota")); clear.inputtitle=translate("Reset now"); clear.inputstyle="apply"; function clear.write(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac"); if mac then sys.call("/usr/libexec/bandwidth-control/check reset "..util.shellquote(mac)) end end
