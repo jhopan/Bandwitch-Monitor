@@ -72,7 +72,6 @@ function savedlease.cfgvalue(self,s)
  return leases()[value] or (value ~= "" and value:upper().." — offline" or translate("Not selected"))
 end
 local newmac=dev:option(ListValue,"new_mac",translate("Select replacement DHCP device")); picker(newmac); newmac.template="bandwidth_control/mac_edit"
-newmac.description=translate("Visible only after Edit MAC. Save & Apply confirms the identity change.")
 function newmac.write(self,s,value)
  if self.map.uci:get("bandwidth-control",s,"edit_mode") ~= "1" or not value or value == "" then return end
  if not unique_mac(self.map.uci,s,value) then self:add_error(s,translate("This MAC already belongs to another device.")); return end
