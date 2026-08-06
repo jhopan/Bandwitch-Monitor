@@ -16,7 +16,14 @@
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(3) { min-width:6rem; }
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4) { min-width:15rem; }
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) { min-width:6rem; }
-.cbi-section-table-row > :nth-child(7) { min-width:10rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) { min-width:10rem; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) input,
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) select { margin-left:auto; margin-right:auto; text-align:center; }
+#cbi-bandwidth-control-device .bc-mac-edit-select { display:none; min-width:15rem; }
+#cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell; }
+#cbi-bandwidth-control-device:not(:has(.bc-mac-edit-active)) th:nth-child(4) { display:none; }
+#cbi-bandwidth-control-device:not(:has(.bc-mac-edit-active)) .cbi-section-table-row > :nth-child(4) { display:none; }
+.bc-mac-edit-select small { display:block; margin-top:.3rem; color:#6b7280; font-size:.8em; }
 .bc-hint { color:#6b7280; font-size:.9em; }
 .bc-device-tabs { display:flex; gap:1.25rem; margin:.25rem 0 1rem; border-bottom:1px solid #d1d5db; }
 .bc-device-tabs button { appearance:none; border:0; background:transparent; color:#6b7280; padding:.55rem .15rem; margin:0; border-bottom:2px solid transparent; font-weight:500; cursor:pointer; }
