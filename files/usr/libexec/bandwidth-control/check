@@ -50,6 +50,17 @@ migrate_all(){
   [ -n "$mac" ] && migrate "$mac"
  done
 }
+stabilize(){
+ mac=$(mac_lc "$1"); b=$(base "$mac")
+ [ -f "$b.migrated" ] && return 0
+ r=$(raw "$mac")
+ printf '%s\n' "$r" > "$b.used"
+ printf '%s\n' "$r" > "$b.last_raw"
+ printf '%s\n' "$r" > "$b.baseline"
+ date +%s > "$b.reset_at"
+ : > "$b.migrated"
+ audit "$mac" migrate stabilized
+}
 usage(){ mac=$(mac_lc "$1"); sync "$mac"; cat "$(base "$mac").used"; }
 used(){ usage "$1"|awk -F'|' '{print $3}'; }
 group_usage(){
@@ -68,4 +79,4 @@ at_least(){ awk -v used="$1" -v limit="$2" 'BEGIN{exit !(used+0 >= limit+0)}'; }
 check_dev(){ s=$1; mac=$(uci -q get bandwidth-control.$s.mac)||return; [ "$(uci -q get bandwidth-control.$s.enabled||echo 1)" = 1 ]||return; history "$mac"; rolling "$mac" "$(uci -q get bandwidth-control.$s.rolling_days||echo 0)"; lim=$(quota "$(uci -q get bandwidth-control.$s.quota_gb||echo 0)")||return; at_least "$(used "$mac")" "$lim" && block "$mac" quota; }
 check_group(){ s=$1; [ "$(uci -q get bandwidth-control.$s.enabled||echo 1)" = 1 ]||return; lim=$(quota "$(uci -q get bandwidth-control.$s.quota_gb||echo 0)")||return; macs=$(uci -q get bandwidth-control.$s.mac 2>/dev/null||true); [ -n "$macs" ]||return; total=$(group_usage $macs | awk -F'|' '{print $3}'); at_least "$total" "$lim" && for mac in $macs;do block "$mac" quota-group;done; }
 check(){ [ "$(uci -q get bandwidth-control.main.enabled||echo 0)" = 1 ]||return; nft_init; uci show bandwidth-control|sed -n 's/^bandwidth-control\.\([^.=]*\)=device$/\1/p'|while read s;do check_dev "$s";done; uci show bandwidth-control|sed -n 's/^bandwidth-control\.\([^.=]*\)=group$/\1/p'|while read s;do check_group "$s";done; }
-case "${1:-check}" in check)check;;sync)sync "$2";;migrate)migrate "$2";;migrate-all)migrate_all;;block)block "$2" "${3:-manual}";;unblock)unblock "$2";;reset)reset "$2";;used)used "$2";;usage)usage "$2";;group-usage)shift; group_usage "$@";;status)status "$2";;leases)leases;;history)history "$2";;quota-bytes)quota "$2";;audit)tail -n "${2:-50}" "$STATE/audit.log" 2>/dev/null||true;;*)exit 2;;esac
+case "${1:-check}" in check)check;;sync)sync "$2";;migrate)migrate "$2";;migrate-all)migrate_all;;stabilize)stabilize "$2";;block)block "$2" "${3:-manual}";;unblock)unblock "$2";;reset)reset "$2";;used)used "$2";;usage)usage "$2";;group-usage)shift; group_usage "$@";;status)status "$2";;leases)leases;;history)history "$2";;quota-bytes)quota "$2";;audit)tail -n "${2:-50}" "$STATE/audit.log" 2>/dev/null||true;;*)exit 2;;esac

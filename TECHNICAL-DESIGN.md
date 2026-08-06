@@ -58,6 +58,7 @@ config group
 | `.last_raw` | last raw nlbwmon RX/TX/total seen by quota engine |
 | `.used` | persistent RX/TX/total accumulated since reset; survives nlbwmon restart |
 | `.reset_at` | epoch reset timestamp |
+| `.migrated` | one-time overflow migration marker; prevents legacy state reconstruction from running again |
 | `.blocked` | blocked marker |
 | `.reason` | `quota`, `quota-group`, `manual` |
 | `.at` | block timestamp |
