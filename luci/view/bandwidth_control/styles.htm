@@ -19,7 +19,6 @@
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) { min-width:10rem; }
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) input,
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) select { margin-left:auto; margin-right:auto; text-align:center; }
-/* Replacement selector is absent until one row enters Edit MAC mode. */
 #cbi-bandwidth-control-device .bc-mac-edit-select { display:none; min-width:15rem; }
 #cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell; }
 #cbi-bandwidth-control-device:not(:has(.bc-mac-edit-active)) th:nth-child(4) { display:none; }
@@ -36,11 +35,11 @@
 }
 </style>
 <nav class="bc-device-tabs" aria-label="Bandwidth Control sections">
- <button type="button" data-bc-page="dashboard" class="active">Dashboard</button>
- <button type="button" data-bc-page="devices">Devices &amp; Groups</button>
- <button type="button" data-bc-page="logs">Logs &amp; Backup</button>
+ <button type="button" data-bc-page="dashboard" class="active"><%:Dashboard%></button>
+ <button type="button" data-bc-page="devices"><%:Devices & Groups%></button>
+ <button type="button" data-bc-page="logs"><%:Logs & Backup%></button>
 </nav>
-<div class="bc-hint">Usage refreshes every 30 seconds when no form field is being edited.</div>
+<div class="bc-hint"><%:Usage refreshes every 30 seconds when no form field is being edited.%></div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var dirty = false;
