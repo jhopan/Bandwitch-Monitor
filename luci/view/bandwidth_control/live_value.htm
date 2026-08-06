@@ -1,0 +1,4 @@
+<%+cbi/valueheader%>
+<% local mac = self.map.uci:get("bandwidth-control", section, "mac") or "" %>
+<span class="bc-live-value" data-bc-mac="<%=pcdata(mac)%>" data-bc-field="<%=pcdata(self.option)%>"><%=pcdata(self:cfgvalue(section) or "")%></span>
+<%+cbi/valuefooter%>

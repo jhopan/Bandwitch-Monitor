@@ -63,10 +63,31 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('change', function () { dirty = true; });
     form.addEventListener('submit', function () { dirty = true; });
   }
-  function refresh() {
-    if (!dirty && !document.querySelector(':focus')) window.location.href = window.location.pathname;
-    else setTimeout(refresh, 30000);
+  var statusUrl = window.location.pathname.replace(/\/$/, '') + '/status';
+  function fmt(bytes) {
+    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB';
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+    return Math.round(bytes / 1024) + ' KB';
   }
-  setTimeout(refresh, 30000);
+  function poll() {
+    if (dirty || document.querySelector(':focus')) return setTimeout(poll, 30000);
+    fetch(statusUrl, { credentials: 'same-origin' })
+      .then(function(res) { if (!res.ok) throw new Error('status'); return res.json(); })
+      .then(function(data) {
+        (data.devices || []).forEach(function(d) {
+          document.querySelectorAll('.bc-live-value[data-bc-mac="' + d.mac + '"]').forEach(function(node) {
+            if (node.dataset.bcField === 'used') {
+              var quotaInput = node.closest('tr').querySelector('input[name$=".quota_gb"]');
+              var quota = quotaInput ? quotaInput.value.replace(',', '.') : '0';
+              node.textContent = fmt(d.used) + ' / ' + quota + ' GB';
+            } else if (node.dataset.bcField === 'details') node.textContent = fmt(d.download) + ' / ' + fmt(d.upload);
+            else if (node.dataset.bcField === 'status') node.textContent = d.state === 'blocked' ? 'Blocked: ' + d.reason : 'Allowed';
+          });
+        });
+      })
+      .catch(function() {})
+      .then(function() { setTimeout(poll, 30000); });
+  }
+  setTimeout(poll, 30000);
 });
 </script>
