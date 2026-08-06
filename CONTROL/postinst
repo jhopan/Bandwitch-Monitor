@@ -1,5 +1,13 @@
 #!/bin/sh
 [ -n "$IPKG_INSTROOT" ] && exit 0
+if [ ! -f /etc/config/bandwidth-control ]; then
+	cat > /etc/config/bandwidth-control << 'EOF'
+config main 'main'
+	option enabled '1'
+	option interval '60'
+	option reset_day '1'
+EOF
+fi
 /etc/init.d/bandwidth-control enable
 /etc/init.d/bandwidth-control start
 exit 0

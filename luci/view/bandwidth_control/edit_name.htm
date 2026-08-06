@@ -1,7 +1,7 @@
 <%+cbi/valueheader%>
 <% if self.map.uci:get("bandwidth-control", section, "edit_mode") == "1" then %>
- <input class="cbi-input-text" type="text" id="<%=self:cbid(section)%>" name="<%=self:cbid(section)%>" value="<%=pcdata(self:cfgvalue(section) or "")%>" />
+ <input class="cbi-input-text" type="text" id="<%=self:cbid(section)%>" name="<%=self:cbid(section)%>" value="<%=pcdata(self:cfgvalue(section) or '')%>" />
 <% else %>
- <span><%=pcdata(self:cfgvalue(section) or "")%></span>
+ <span><%=pcdata(self:cfgvalue(section) or '')%></span>
 <% end %>
 <%+cbi/valuefooter%>
