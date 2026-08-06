@@ -19,13 +19,7 @@
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) { min-width:10rem; }
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) input,
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) select { margin-left:auto; margin-right:auto; text-align:center; }
-#cbi-bandwidth-control-device .bc-mac-edit-select { display:none; min-width:15rem; }
-#cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell; }
-#cbi-bandwidth-control-device th:nth-child(4),
-#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4) { display:none; }
-#cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell !important; }
-.bc-mac-edit-select small { display:block; margin-top:.3rem; color:#6b7280; font-size:.8em; }
-.bc-hint { color:#6b7280; font-size:.9em; }
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(6) { min-width:6rem; }
 .bc-device-tabs { display:flex; gap:1.25rem; margin:.25rem 0 1rem; border-bottom:1px solid #d1d5db; }
 .bc-device-tabs button { appearance:none; border:0; background:transparent; color:#6b7280; padding:.55rem .15rem; margin:0; border-bottom:2px solid transparent; font-weight:500; cursor:pointer; }
 .bc-device-tabs button.active { color:#111827; border-bottom-color:#111827; font-weight:700; }
@@ -68,15 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   tabs.forEach(function(tab) { tab.addEventListener('click', function() { setPage(tab.dataset.bcPage); }); });
   setPage('dashboard');
-  function syncMacEditHeader() {
-    var devTbl = document.querySelector('#cbi-bandwidth-control-device');
-    if (!devTbl) return;
-    var active = devTbl.querySelector('.bc-mac-edit-active');
-    var th = devTbl.querySelector('th:nth-child(4)');
-    if (th) th.style.display = active ? '' : 'none';
-  }
-  syncMacEditHeader();
-  document.querySelector('#cbi-bandwidth-control-device') && document.querySelector('#cbi-bandwidth-control-device').addEventListener('click', function() { setTimeout(syncMacEditHeader, 100); });
   if (form) {
     form.addEventListener('input', function () { dirty = true; });
     form.addEventListener('change', function () { dirty = true; });

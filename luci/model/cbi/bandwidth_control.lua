@@ -64,12 +64,7 @@ function name.write(self,s,value)
 end
 local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
 local stat=dev:option(DummyValue,"status",translate("Status")); stat.template="bandwidth_control/live_value"; function stat.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local a,b,c=state(mac); return a=="blocked" and ("Blocked: "..b.." "..c) or "Allowed" end
-local savedlease=dev:option(DummyValue,"saved_lease",translate("Current device"))
-function savedlease.cfgvalue(self,s)
- local value=self.map.uci:get("bandwidth-control",s,"mac") or ""
- return leases()[value] or (value ~= "" and value:upper().." — offline" or translate("Not selected"))
-end
-local newmac=dev:option(ListValue,"new_mac",translate("Select replacement DHCP device")); picker(newmac); newmac.template="bandwidth_control/mac_edit"
+local newmac=dev:option(ListValue,"new_mac",translate("DHCP Device")); picker(newmac); newmac.template="bandwidth_control/mac_edit"
 function newmac.write(self,s,value)
  if self.map.uci:get("bandwidth-control",s,"edit_mode") ~= "1" or not value or value == "" then return end
  if not unique_mac(self.map.uci,s,value) then self:add_error(s,translate("This MAC already belongs to another device.")); return end
