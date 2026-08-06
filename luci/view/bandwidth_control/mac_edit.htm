@@ -1,24 +1,13 @@
 <% local active = self.map.uci:get("bandwidth-control", section, "edit_mode") == "1"
    local cbid = self:cbid(section) %>
 <td class="td cbi-section-table-cell bc-mac-edit-select<% if active then %> bc-mac-edit-active<% end %>">
-<% if active then
-     local choices = self:choices()
-     if choices then %>
-	<div<%=attr("data-ui-widget", luci.util.serialize_json({
-		"Combobox", self:cfgvalue(section) or self.default, choices, {
-			id = cbid,
-			name = cbid,
-			size = self.size,
-			sort = self.keylist,
-			datatype = self.datatype,
-			optional = self.optional or self.rmempty,
-			readonly = self.readonly,
-			maxlength = self.maxlength,
-			placeholder = self.placeholder,
-			custom_placeholder = self.combobox_manual
-		}
-	}))%>></div>
-	<small><%:Choose device, then Save & Apply.%></small>
-<%   end
-   end %>
+<% if active then local choices = self:choices() or {} %>
+ <select class="cbi-input-select" id="<%=cbid%>" name="<%=cbid%>">
+  <option value=""><%:Select connected device%></option>
+  <% for key, label in pairs(choices) do %>
+   <option value="<%=pcdata(key)%>"<% if self:cfgvalue(section) == key then %> selected="selected"<% end %>><%=pcdata(label)%></option>
+  <% end %>
+ </select>
+ <small><%:Choose device, then Save & Apply.%></small>
+<% end %>
 </td>
