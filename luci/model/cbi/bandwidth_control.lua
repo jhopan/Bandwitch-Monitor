@@ -60,23 +60,24 @@ dash.description=string.format("%d configured device(s), %d blocked. Warning: ye
 local dev=m:section(TypedSection,"device",translate("Devices"),translate("Each saved device is locked to its MAC. Click Edit MAC before changing device identity.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
 dev:option(Value,"name",translate("Name"))
 local mac=dev:option(DummyValue,"mac",translate("Device MAC (locked)")); function mac.cfgvalue(self,s) return (self.map.uci:get("bandwidth-control",s,"mac") or translate("Not selected")):upper() end
-local editmac=dev:option(Button,"edit_mac",translate("Device identity")); editmac.inputtitle=translate("Edit MAC"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mac","1") end
+local editmac=dev:option(Button,"begin_edit",translate("Device identity")); editmac.inputtitle=translate("Edit MAC"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
+local editmode=dev:option(Flag,"edit_mode",translate("Edit active")); editmode.template="cbi/hiddenfield"
 local savedlease=dev:option(DummyValue,"saved_lease",translate("DHCP device (locked)"))
 function savedlease.cfgvalue(self,s)
  local value=self.map.uci:get("bandwidth-control",s,"mac") or ""
  return leases()[value] or (value ~= "" and value:upper().." — offline" or translate("Not selected"))
 end
-local newmac=dev:option(ListValue,"new_mac",translate("Select replacement DHCP device")); picker(newmac); newmac:depends("edit_mac","1")
-newmac.description=translate("Visible only after Edit MAC. Save & Apply confirms the identity change.")
+local newmac=dev:option(ListValue,"new_mac",translate("Select replacement DHCP device")); picker(newmac); newmac:depends("edit_mode","1")
+newmac.description=translate("Edit MAC then Save & Apply confirms the identity change.")
 function newmac.write(self,s,value)
- if self.map.uci:get("bandwidth-control",s,"edit_mac") ~= "1" then return end
+ if self.map.uci:get("bandwidth-control",s,"edit_mode") ~= "1" then return end
  if not unique_mac(self.map.uci,s,value) then self:add_error(s,translate("This MAC already belongs to another device.")); return end
  self.map.uci:set("bandwidth-control",s,"mac",value)
- self.map.uci:delete("bandwidth-control",s,"edit_mac")
+ self.map.uci:delete("bandwidth-control",s,"edit_mode")
 end
 function dev.create(self,section)
  local s=TypedSection.create(self,section)
- self.map.uci:set("bandwidth-control",s,"edit_mac","1")
+ self.map.uci:set("bandwidth-control",s,"edit_mode","1")
  return s
 end
 local quota=dev:option(Value,"quota_gb",translate("Quota (GB)"))
