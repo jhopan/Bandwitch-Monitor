@@ -61,9 +61,15 @@ local dev=m:section(TypedSection,"device",translate("Devices"),translate("Each s
 dev:option(Value,"name",translate("Name"))
 local mac=dev:option(DummyValue,"mac",translate("Device MAC (locked)")); function mac.cfgvalue(self,s) return (self.map.uci:get("bandwidth-control",s,"mac") or translate("Not selected")):upper() end
 local editmac=dev:option(Button,"edit_mac",translate("Device identity")); editmac.inputtitle=translate("Edit MAC"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mac","1") end
-local newmac=dev:option(ListValue,"new_mac",translate("New DHCP device")); picker(newmac); newmac:depends("edit_mac","1")
+local newmac=dev:option(ListValue,"new_mac",translate("DHCP device")); picker(newmac)
+function newmac.cfgvalue(self,s)
+ return self.map.uci:get("bandwidth-control",s,"mac") or ""
+end
+newmac.description=translate("Shows saved identity. Select a replacement only after clicking Edit MAC, then Save & Apply.")
 function newmac.write(self,s,value)
- if self.map.uci:get("bandwidth-control",s,"edit_mac") ~= "1" then return end
+ if self.map.uci:get("bandwidth-control",s,"edit_mac") ~= "1" then
+  self:add_error(s,translate("Device MAC is locked. Click Edit MAC first.")); return
+ end
  if not unique_mac(self.map.uci,s,value) then self:add_error(s,translate("This MAC already belongs to another device.")); return end
  self.map.uci:set("bandwidth-control",s,"mac",value)
  self.map.uci:delete("bandwidth-control",s,"edit_mac")
