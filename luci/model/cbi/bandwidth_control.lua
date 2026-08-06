@@ -58,11 +58,9 @@ end)
 dash.description=string.format("%d configured device(s), %d blocked. Warning: yellow 80%%, red 95%%, blocked 100%%. Backup: <a href='%s'>download config and usage state</a>.",total,blocked,require("luci.dispatcher").build_url("admin/services/bandwidth-control/backup"))
 
 local dev=m:section(TypedSection,"device",translate("Devices"),translate("Quota per device. Click Edit only when replacing the connected device.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
-local name=dev:option(Value,"name",translate("Name")); name.template="bandwidth_control/edit_name"
+local name=dev:option(Value,"name",translate("Name"))
 function name.write(self,s,value)
- if self.map.uci:get("bandwidth-control",s,"edit_mode")=="1" and value and value ~= "" then
-  Value.write(self,s,value); self.map.uci:set("bandwidth-control",s,"finish_edit","1")
- end
+ if value and value ~= "" then Value.write(self,s,value) end
 end
 local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
 local stat=dev:option(DummyValue,"status",translate("Status")); stat.template="bandwidth_control/live_value"; function stat.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local a,b,c=state(mac); return a=="blocked" and ("Blocked: "..b.." "..c) or "Allowed" end
