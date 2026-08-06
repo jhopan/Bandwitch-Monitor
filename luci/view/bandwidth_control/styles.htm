@@ -68,6 +68,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   tabs.forEach(function(tab) { tab.addEventListener('click', function() { setPage(tab.dataset.bcPage); }); });
   setPage('dashboard');
+  function syncMacEditHeader() {
+    var devTbl = document.querySelector('#cbi-bandwidth-control-device');
+    if (!devTbl) return;
+    var active = devTbl.querySelector('.bc-mac-edit-active');
+    var th = devTbl.querySelector('th:nth-child(4)');
+    if (th) th.style.display = active ? '' : 'none';
+  }
+  syncMacEditHeader();
+  document.querySelector('#cbi-bandwidth-control-device') && document.querySelector('#cbi-bandwidth-control-device').addEventListener('click', function() { setTimeout(syncMacEditHeader, 100); });
   if (form) {
     form.addEventListener('input', function () { dirty = true; });
     form.addEventListener('change', function () { dirty = true; });
