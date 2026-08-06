@@ -21,8 +21,9 @@
 #cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(7) select { margin-left:auto; margin-right:auto; text-align:center; }
 #cbi-bandwidth-control-device .bc-mac-edit-select { display:none; min-width:15rem; }
 #cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell; }
-#cbi-bandwidth-control-device:not(:has(.bc-mac-edit-active)) th:nth-child(4) { display:none; }
-#cbi-bandwidth-control-device:not(:has(.bc-mac-edit-active)) .cbi-section-table-row > :nth-child(4) { display:none; }
+#cbi-bandwidth-control-device th:nth-child(4),
+#cbi-bandwidth-control-device .cbi-section-table-row > :nth-child(4) { display:none; }
+#cbi-bandwidth-control-device .bc-mac-edit-active { display:table-cell !important; }
 .bc-mac-edit-select small { display:block; margin-top:.3rem; color:#6b7280; font-size:.8em; }
 .bc-hint { color:#6b7280; font-size:.9em; }
 .bc-device-tabs { display:flex; gap:1.25rem; margin:.25rem 0 1rem; border-bottom:1px solid #d1d5db; }
