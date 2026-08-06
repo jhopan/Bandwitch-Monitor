@@ -25,36 +25,39 @@
  .cbi-section-table input[type="text"], .cbi-section-table select { min-width: 8rem; max-width: 10rem; }
 }
 </style>
-<nav class="bc-device-tabs" aria-label="Device sections">
- <button type="button" data-bc-tab="devices" class="active">Devices</button>
- <button type="button" data-bc-tab="usage">Usage</button>
- <button type="button" data-bc-tab="actions">Actions</button>
+<nav class="bc-device-tabs" aria-label="Bandwidth Control sections">
+ <button type="button" data-bc-page="dashboard" class="active">Dashboard</button>
+ <button type="button" data-bc-page="devices">Devices &amp; Groups</button>
+ <button type="button" data-bc-page="logs">Logs &amp; Backup</button>
 </nav>
 <div class="bc-hint">Usage refreshes every 30 seconds when no form field is being edited.</div>
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
   var dirty = false;
   var form = document.querySelector('form');
-  var table = document.querySelector('#cbi-bandwidth-control-device table');
   var tabs = document.querySelectorAll('.bc-device-tabs button');
-  var tabColumns = {
-    devices: [1,2,3,5,6,7,8],
-    usage: [1,3,8,9,10,11],
-    actions: [1,2,3,11,12,13,14,15,16]
-  };
-  function setTab(name) {
-    if (!table) return;
-    var allowed = tabColumns[name] || tabColumns.devices;
-    table.querySelectorAll('tr').forEach(function(row) {
-      Array.prototype.forEach.call(row.children, function(cell, index) {
-        var number = index + 1;
-        cell.style.display = allowed.indexOf(number) >= 0 ? '' : 'none';
-      });
-    });
-    tabs.forEach(function(tab) { tab.classList.toggle('active', tab.dataset.bcTab === name); });
+  var device = document.querySelector('#cbi-bandwidth-control-device');
+  var groups = document.querySelector('#cbi-bandwidth-control-group');
+  var main = document.querySelector('#cbi-bandwidth-control-main');
+  var sections = document.querySelectorAll('.cbi-section');
+  var logSections = [];
+  var dashboardSections = [];
+  sections.forEach(function(section) {
+    var text = section.textContent || '';
+    if (section === device || section === groups || section === main) return;
+    if (/Audit log|Backup and restore/.test(text)) logSections.push(section);
+    else if (/Dashboard/.test(text)) dashboardSections.push(section);
+  });
+  function visible(list, show) { list.forEach(function(node) { node.style.display = show ? '' : 'none'; }); }
+  function setPage(name) {
+    visible([main].filter(Boolean), name === 'dashboard');
+    visible(dashboardSections, name === 'dashboard');
+    visible([device, groups].filter(Boolean), name === 'devices');
+    visible(logSections, name === 'logs');
+    tabs.forEach(function(tab) { tab.classList.toggle('active', tab.dataset.bcPage === name); });
   }
-  tabs.forEach(function(tab) { tab.addEventListener('click', function() { setTab(tab.dataset.bcTab); }); });
-  setTab('devices');
+  tabs.forEach(function(tab) { tab.addEventListener('click', function() { setPage(tab.dataset.bcPage); }); });
+  setPage('dashboard');
   if (form) {
     form.addEventListener('input', function () { dirty = true; });
     form.addEventListener('change', function () { dirty = true; });
@@ -65,5 +68,5 @@
     else setTimeout(refresh, 30000);
   }
   setTimeout(refresh, 30000);
-}());
+});
 </script>
