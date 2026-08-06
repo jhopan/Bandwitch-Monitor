@@ -57,11 +57,10 @@ m.uci:foreach("bandwidth-control", "device", function(s)
 end)
 dash.description=string.format("%d configured device(s), %d blocked. Warning: yellow 80%%, red 95%%, blocked 100%%. Backup: <a href='%s'>download config and usage state</a>.",total,blocked,require("luci.dispatcher").build_url("admin/services/bandwidth-control/backup"))
 
-local dev=m:section(TypedSection,"device",translate("Devices"),translate("Each saved device is locked to its MAC. Click Edit MAC before changing device identity.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
+local dev=m:section(TypedSection,"device",translate("Devices"),translate("Quota per device. Click Edit only when replacing the connected device.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
 dev:option(Value,"name",translate("Name"))
-local mac=dev:option(DummyValue,"mac",translate("Device MAC (locked)")); function mac.cfgvalue(self,s) return (self.map.uci:get("bandwidth-control",s,"mac") or translate("Not selected")):upper() end
-local editmac=dev:option(Button,"begin_edit",translate("Device identity")); editmac.inputtitle=translate("Edit MAC"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
-local savedlease=dev:option(DummyValue,"saved_lease",translate("DHCP device (locked)"))
+local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit MAC"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
+local savedlease=dev:option(DummyValue,"saved_lease",translate("Current device"))
 function savedlease.cfgvalue(self,s)
  local value=self.map.uci:get("bandwidth-control",s,"mac") or ""
  return leases()[value] or (value ~= "" and value:upper().." — offline" or translate("Not selected"))

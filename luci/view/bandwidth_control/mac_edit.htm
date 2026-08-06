@@ -1,7 +1,9 @@
-<% if self.map.uci:get("bandwidth-control", section, "edit_mode") == "1" then %>
-<%+cbi/valueheader%>
-<% local choices = self:choices()
-   if choices then %>
+<% local active = self.map.uci:get("bandwidth-control", section, "edit_mode") == "1"
+   local cbid = self:cbid(section) %>
+<td class="td cbi-section-table-cell bc-mac-edit-select<% if active then %> bc-mac-edit-active<% end %>">
+<% if active then
+     local choices = self:choices()
+     if choices then %>
 	<div<%=attr("data-ui-widget", luci.util.serialize_json({
 		"Combobox", self:cfgvalue(section) or self.default, choices, {
 			id = cbid,
@@ -16,6 +18,7 @@
 			custom_placeholder = self.combobox_manual
 		}
 	}))%>></div>
-<% end %>
-<%+cbi/valuefooter%>
-<% end %>
+	<small><%:Choose device, then Save & Apply.%></small>
+<%   end
+   end %>
+</td>
