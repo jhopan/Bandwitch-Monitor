@@ -58,31 +58,8 @@ end)
 dash.description=string.format("%d configured device(s), %d blocked. Warning: yellow 80%%, red 95%%, blocked 100%%. Backup: <a href='%s'>download config and usage state</a>.",total,blocked,require("luci.dispatcher").build_url("admin/services/bandwidth-control/backup"))
 
 local dev=m:section(TypedSection,"device",translate("Devices"),translate("Quota per device. Click Edit only when replacing the connected device.")); dev.anonymous=true; dev.addremove=true; dev.template="cbi/tblsection"
-local name=dev:option(Value,"name",translate("Name")); name.template="bandwidth_control/edit_name"
-function name.write(self,s,value)
- if self.map.uci:get("bandwidth-control",s,"edit_mode")=="1" and value and value ~= "" then
-  Value.write(self,s,value); self.map.uci:set("bandwidth-control",s,"finish_edit","1")
- end
-end
-local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
-local stat=dev:option(DummyValue,"status",translate("Status")); stat.template="bandwidth_control/live_value"; function stat.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local a,b,c=state(mac); return a=="blocked" and ("Blocked: "..b.." "..c) or "Allowed" end
-local savedlease=dev:option(DummyValue,"saved_lease",translate("Current device"))
-function savedlease.cfgvalue(self,s)
- local value=self.map.uci:get("bandwidth-control",s,"mac") or ""
- return leases()[value] or (value ~= "" and value:upper().." — offline" or translate("Not selected"))
-end
-local newmac=dev:option(ListValue,"new_mac",translate("Select replacement DHCP device")); picker(newmac); newmac.template="bandwidth_control/mac_edit"
-function newmac.write(self,s,value)
- if self.map.uci:get("bandwidth-control",s,"edit_mode") ~= "1" or not value or value == "" then return end
- if not unique_mac(self.map.uci,s,value) then self:add_error(s,translate("This MAC already belongs to another device.")); return end
- self.map.uci:set("bandwidth-control",s,"mac",value)
- self.map.uci:set("bandwidth-control",s,"finish_edit","1")
-end
-function dev.create(self,section)
- local s=TypedSection.create(self,section)
- self.map.uci:set("bandwidth-control",s,"edit_mode","1")
- return s
-end
+local name=dev:option(Value,\"name\",translate(\"Name\"))
+local stat=dev:option(DummyValue,\"status\",translate(\"Status\")); stat.template=\"bandwidth_control/live_value\"; function stat.cfgvalue(self,s) local mac=self.map.uci:get(\"bandwidth-control\",s,\"mac\") or \"\"; local a,b,c=state(mac); return a==\"blocked\" and (\"Blocked: \"..b..\" \"..c) or \"Allowed\" end
 local quota=dev:option(Value,"quota_gb",translate("Quota (GB)"))
 function quota.validate(self,v) v=(v or ""):gsub(",", "."); if v:match("^%d+%.?%d*$") and tonumber(v)>0 then return v end; return nil, translate("Use a positive GB value, e.g. 0,1 or 0.5") end
 local rolling=dev:option(ListValue,"rolling_days",translate("Per-device reset")); rolling:value("0",translate("Use monthly reset")); rolling:value("7",translate("Every 7 days")); rolling:value("30",translate("Every 30 days")); rolling.default="0"
@@ -102,12 +79,6 @@ local gused=group:option(DummyValue,"usage",translate("Usage / remaining")); fun
 local gdetail=group:option(DummyValue,"detail",translate("Down / Up / members")); function gdetail.cfgvalue(self,s) local macs=self.map.uci:get_list("bandwidth-control",s,"mac") or {}; local rx,tx=group_usage(macs); return string.format("%s / %s / %d device(s)",fmt(rx),fmt(tx),#macs) end
 local gstate=group:option(DummyValue,"status",translate("Status")); function gstate.cfgvalue(self,s) local macs=self.map.uci:get_list("bandwidth-control",s,"mac") or {}; local q=quota_value(self.map.uci:get("bandwidth-control",s,"quota_gb")); local _,_,n=group_usage(macs); return q>0 and n>=q*1073741824 and translate("Quota reached") or translate("Allowed") end
 function m.on_after_commit(self)
- self.uci:foreach("bandwidth-control","device",function(s)
-  if s.finish_edit == "1" then
-   self.uci:delete("bandwidth-control",s[".name"],"edit_mode")
-   self.uci:delete("bandwidth-control",s[".name"],"finish_edit")
-  end
- end)
  local day=self.uci:get("bandwidth-control","main","reset_day")
  if day and day:match("^[1-9]$|^[12][0-9]$") then
   sys.call("uci set nlbwmon.@nlbwmon[0].database_interval="..util.shellquote(day).."; uci commit nlbwmon; /etc/init.d/nlbwmon restart")
