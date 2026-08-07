@@ -28,11 +28,11 @@ local function fmt(n)
 end
 local function leases()
  local t={} for l in sys.exec("/usr/libexec/bandwidth-control/check leases 2>/dev/null"):gmatch("[^\r\n]+") do
-  local mac,ip,host=l:match("^([^|]+)|([^|]+)|(.+)$"); if mac then t[mac]=string.format("%s — %s (%s)",mac:upper(),host,ip) end
+  local mac,ip,host=l:match("^([^|]+)|([^|]+)|(.+)$"); if mac then t[mac]={label=string.format("%s — %s (%s)",mac:upper(),host,ip),ip=ip} end
  end return t
 end
 local function picker(o)
- o.datatype="macaddr"; for mac,label in pairs(leases()) do o:value(mac,label) end
+ o.datatype="macaddr"; for mac,v in pairs(leases()) do o:value(mac,v.label) end
 end
 local function unique_mac(cursor, section, value)
  local unique=true
@@ -65,6 +65,13 @@ end
 local editmac=dev:option(Button,"begin_edit",translate("Edit")); editmac.inputtitle=translate("Edit"); editmac.inputstyle="apply"; function editmac.write(self,s) self.map.uci:set("bandwidth-control",s,"edit_mode","1") end
 local stat=dev:option(DummyValue,"status",translate("Status")); stat.template="bandwidth_control/live_value"; function stat.cfgvalue(self,s) local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""; local a,b,c=state(mac); return a=="blocked" and ("Blocked: "..b.." "..c) or "Allowed" end
 local newmac=dev:option(ListValue,"new_mac",translate("DHCP Device")); picker(newmac); newmac.template="bandwidth_control/mac_edit"
+function newmac.cfgvalue(self,s)
+ local mac=self.map.uci:get("bandwidth-control",s,"mac") or ""
+ if mac == "" then return "" end
+ local info=leases()[mac:lower()] or leases()[mac]
+ local ip=info and info.ip or ""
+ return mac.."|"..(ip or "")
+end
 function newmac.write(self,s,value)
  if self.map.uci:get("bandwidth-control",s,"edit_mode") ~= "1" or not value or value == "" then return end
  if not unique_mac(self.map.uci,s,value) then self:add_error(s,translate("This MAC already belongs to another device.")); return end

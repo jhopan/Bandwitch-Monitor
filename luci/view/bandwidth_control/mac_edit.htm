@@ -1,8 +1,9 @@
 <% local active = self.map.uci:get("bandwidth-control", section, "edit_mode") == "1"
    local cbid = self:cbid(section)
-   local mac = self.map.uci:get("bandwidth-control", section, "mac") or ""
-   local label = self:cfgvalue(section) or ""
-   if label == "" then label = mac ~= "" and mac:upper() or "-" end %>
+   local raw = self:cfgvalue(section) or ""
+   local mac, ip = raw:match("^([^|]*)|(.*)$")
+   if not mac then mac = raw; ip = "" end
+   if mac == "" then mac = "-" end %>
 <td class="td cbi-section-table-cell">
 <% if active then local choices = self:choices() or {} %>
  <select class="cbi-input-select" id="<%=cbid%>" name="<%=cbid%>">
@@ -13,6 +14,7 @@
  </select>
  <small><%:Choose device, then Save & Apply.%></small>
 <% else %>
- <span><%=pcdata(label)%></span>
+ <span style='font-family:monospace'><%=pcdata(mac:upper())%></span>
+ <% if ip ~= "" then %><br><small style='color:#6b7280'><%=pcdata(ip)%></small><% end %>
 <% end %>
 </td>

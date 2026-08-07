@@ -18,7 +18,7 @@
 - Download + upload accounting via `nlbwmon`, with persistent 64-bit-safe counters for multi-gigabyte and terabyte-scale quotas.
 - Auto block through nftables after quota is reached. Verified on a live OpenWrt AP + LAN bridge deployment.
 - Manual block, unblock, and persistent reset quota baseline. Usage survives service/router restarts.
-- DHCP lease picker. Device MAC locks after save; Edit MAC is required to change identity. Duplicate device MACs are rejected.
+- DHCP Device column shows MAC + IP address. Dropdown to change device appears only when Edit is clicked. Duplicate device MACs are rejected.
 - Optional static DHCP lease button.
 - Monthly global reset or per-device 7/30 day rolling reset.
 - Usage details, last seen hostname/IP, block reason, timestamp.
