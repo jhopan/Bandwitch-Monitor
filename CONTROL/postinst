@@ -8,6 +8,9 @@ config main 'main'
 	option reset_day '1'
 EOF
 fi
+grep -q 'bandwidth-control.*hourly-backup' /etc/crontabs/root 2>/dev/null || \
+	echo "0 * * * * cp /etc/config/bandwidth-control /etc/config/bandwidth-control.hourly-backup" >> /etc/crontabs/root
+/etc/init.d/cron restart
 /etc/init.d/bandwidth-control enable
 /etc/init.d/bandwidth-control start
 exit 0
