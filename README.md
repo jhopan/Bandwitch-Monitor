@@ -1,29 +1,34 @@
 <div align="center">
 
-# Bandwidth Control
+# 🚀 Bandwidth Control
 
-**OpenWrt per-MAC and group data quota control with LuCI**
+**The Ultimate OpenWrt Per-MAC & Group Data Quota Controller with LuCI**
 
 [![OpenWrt](https://img.shields.io/badge/OpenWrt-24.10%2B-blue?style=for-the-badge)](https://openwrt.org/)
 [![Architecture](https://img.shields.io/badge/Architecture-all-lightgrey?style=for-the-badge)](#install)
 [![LuCI](https://img.shields.io/badge/GUI-LuCI-green?style=for-the-badge)](#usage)
 [![IPK](https://img.shields.io/badge/Package-IPK-orange?style=for-the-badge)](dist/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> 💡 **Love this project?** Please consider giving it a ⭐ **Star** on GitHub to help others find it! 
 
 </div>
 
-## Features
+---
 
-- Per-MAC quota. Supports decimal GB: `0,1`, `0.5`, `1,5`.
-- Shared quota groups with total usage, remaining quota, RX/TX, member count, and quota status in LuCI.
-- Download + upload accounting via `nlbwmon`, with persistent 64-bit-safe counters for multi-gigabyte and terabyte-scale quotas.
-- Auto block through nftables after quota is reached. Verified on a live OpenWrt AP + LAN bridge deployment.
-- Manual block, unblock, and persistent reset quota baseline. Usage survives service/router restarts.
-- DHCP Device column shows MAC + IP address. Dropdown to change device appears only when Edit is clicked. Duplicate device MACs are rejected.
-- Optional static DHCP lease button.
-- Monthly global reset or per-device 7/30 day rolling reset.
-- Usage details, last seen hostname/IP, block reason, timestamp.
-- Audit log, backup, restore.
-- LuCI usage refresh every 30 seconds. Refresh returns to the main page, so action endpoints such as Reset are never repeated.
+Manage internet usage fairly without complex captive portals. Set precise data limits for individual devices or shared groups. Once the limit is reached, access is automatically blocked via `nftables` while local networking remains intact.
+
+## ✨ Features
+
+- **🎯 Precision Per-MAC Quota**: Support for decimal GB formats (`0.1`, `0.5`, `1.5` GB).
+- **👥 Shared Quota Groups**: Pool devices together. See total usage, remaining quota, RX/TX, and member count directly in LuCI.
+- **🛡️ Bulletproof Enforcement**: Auto-blocks via `nftables` when quota is hit. Verified on live OpenWrt AP + LAN bridge setups.
+- **📊 Terabyte-Scale Accounting**: Powered by `nlbwmon` with persistent 64-bit-safe counters. Survives router reboots!
+- **⚡ Smart DHCP Device Picker**: Clean UI showing MAC + IP Address. Dropdowns appear only when editing. Auto-prevents duplicate MACs.
+- **🔄 Flexible Reset Cycles**: Choose between global monthly resets or per-device rolling periods (e.g., every 7 or 30 days).
+- **💾 Automated Backups**: Safely backs up your config and usage state every hour to `/etc/config/bandwidth-control.hourly-backup`.
+- **🛠️ Total Management**: Manual block/unblock, static IP lease toggles, detailed audit logs, and one-click manual backup/restore.
+- **⏱️ Live Dashboard**: Usage refreshes every 30 seconds smoothly without annoying page reloads.
 
 ## Requirements
 
@@ -189,6 +194,6 @@ Read these before changing behavior:
 - `ROADMAP.md` — shipped work and next priorities
 - `DEVELOPMENT.md` — local build, STB deploy, troubleshooting, release workflow
 
-## License
+## 📄 License
 
-No license selected yet.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
