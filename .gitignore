@@ -9,3 +9,7 @@ files/etc/bandwidth-control/
 
 # Keep release package in dist/
 !dist/bandwidth-control_*.ipk
+
+# Windows BOM-garbage dirs
+.build-stage*/
+dist*/
