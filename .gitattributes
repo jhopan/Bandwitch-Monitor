@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.sh text eol=lf
+*.htm text eol=lf
+*.lua text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.ipk binary
+*.tar.gz binary
+*.gz binary
