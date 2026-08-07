@@ -27,7 +27,10 @@ jobs:
       - name: Run shell tests
         run: |
           chmod +x build-ipk.sh files/usr/libexec/bandwidth-control/check tests/*.sh
-          for test in tests/*.sh; do sh "$test"; done
+          for test in tests/*.sh; do
+            echo "=== $test ==="
+            sh "$test"
+          done
 
       - name: Build IPK
         run: ./build-ipk.sh
